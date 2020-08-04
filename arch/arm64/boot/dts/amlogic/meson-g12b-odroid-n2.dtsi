@@ -2,12 +2,14 @@
 /*
  * Copyright (c) 2019 BayLibre, SAS
  * Author: Neil Armstrong <narmstrong@baylibre.com>
+ * Changed: Igor Pecovnik <igor@armbian.com>
  */
 
 #include <dt-bindings/input/input.h>
 #include <dt-bindings/gpio/meson-g12a-gpio.h>
 #include <dt-bindings/sound/meson-g12a-toacodec.h>
 #include <dt-bindings/sound/meson-g12a-tohdmitx.h>
+#include <dt-bindings/pwm/pwm.h>
 
 / {
 	aliases {
@@ -28,6 +30,22 @@
 
 	chosen {
 		stdout-path = "serial0:115200n8";
+	};
+
+	pwmgpio:pwmgpio {
+		compatible = "pwm-gpio";
+		#pwm-cells = <3>;
+		pwm-gpios = <&gpio_ao GPIOAO_10 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
+
+	pwmfan:pwm-fan {
+		compatible = "pwm-fan";
+		pwms = <&pwmgpio 0 40000 PWM_POLARITY_INVERTED>;
+		cooling-min-state = <0>;
+		cooling-max-state = <3>;
+		#cooling-cells = <2>;
+		cooling-levels = <0 120 170 220>;
 	};
 
 	memory@0 {
@@ -422,6 +440,16 @@
 			hysteresis = <2000>; /* millicelsius */
 			type = "passive";
 		};
+		fan_0: trip-point@0 {
+			temperature = <65000>;
+			hysteresis = <5000>;
+			type = "active";
+		};
+		fan_1: trip-point@1 {
+			temperature = <75000>;
+			hysteresis = <5000>;
+			type = "active";
+		};
 	};
 	cooling-maps {
 		cpufreq_map0 {
@@ -435,6 +463,14 @@
 					 <&cpu101 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
 					 <&cpu102 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
 					 <&cpu103 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
+		};
+		fan_cooling_map0 {
+			trip = <&fan_0>;
+			cooling-device = <&pwmfan THERMAL_NO_LIMIT 2>;
+		};
+		fan_cooling_map1 {
+			trip = <&fan_1>;
+			cooling-device = <&pwmfan 2 THERMAL_NO_LIMIT>;
 		};
 	};
 };
