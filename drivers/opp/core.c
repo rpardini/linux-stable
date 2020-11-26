@@ -1641,6 +1641,9 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_set_supported_hw);
  */
 void dev_pm_opp_put_supported_hw(struct opp_table *opp_table)
 {
+	if (unlikely(!opp_table))
+		return;
+
 	/* Make sure there are no concurrent readers while updating opp_table */
 	WARN_ON(!list_empty(&opp_table->opp_list));
 
@@ -1697,6 +1700,9 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_set_prop_name);
  */
 void dev_pm_opp_put_prop_name(struct opp_table *opp_table)
 {
+	if (unlikely(!opp_table))
+		return;
+
 	/* Make sure there are no concurrent readers while updating opp_table */
 	WARN_ON(!list_empty(&opp_table->opp_list));
 
@@ -1825,6 +1831,9 @@ void dev_pm_opp_put_regulators(struct opp_table *opp_table)
 {
 	int i;
 
+	if (unlikely(!opp_table))
+		return;
+
 	if (!opp_table->regulators)
 		goto put_opp_table;
 
@@ -1907,6 +1916,9 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_set_clkname);
  */
 void dev_pm_opp_put_clkname(struct opp_table *opp_table)
 {
+	if (unlikely(!opp_table))
+		return;
+
 	/* Make sure there are no concurrent readers while updating opp_table */
 	WARN_ON(!list_empty(&opp_table->opp_list));
 
@@ -1962,6 +1974,9 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_register_set_opp_helper);
  */
 void dev_pm_opp_unregister_set_opp_helper(struct opp_table *opp_table)
 {
+	if (unlikely(!opp_table))
+		return;
+
 	/* Make sure there are no concurrent readers while updating opp_table */
 	WARN_ON(!list_empty(&opp_table->opp_list));
 
@@ -2090,6 +2105,9 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_attach_genpd);
  */
 void dev_pm_opp_detach_genpd(struct opp_table *opp_table)
 {
+	if (unlikely(!opp_table))
+		return;
+
 	/*
 	 * Acquire genpd_virt_dev_lock to make sure virt_dev isn't getting
 	 * used in parallel.
